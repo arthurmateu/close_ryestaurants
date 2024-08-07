@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>close ryestaurants</title>
+    <script src="https://unpkg.com/htmx.org@2.0.1"></script>
+
+    <script>
+        function getLocation() {
+            console.log("Getting location!")
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendPosition)
+            } else {
+                alert("Geolocation is not supported by this browser.")
+            }
+        }
+
+        function sendPosition(position) {
+            console.log("Location: ", position.coords);
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            // note: I got help here because apparently htmx replacing itself causes an infinite loop and I couldn't find any solutions to the problem
+            const resultDiv = document.getElementById("result");
+            resultDiv.setAttribute("hx-get", `/find_restaurants?lat=${lat}&lon=${lon}`);
+            resultDiv.setAttribute("hx-trigger", "load");
+            console.log("HTMX request URL set:", resultDiv.getAttribute("hx-get"));
+            resultDiv.removeAttribute("hx-swap-oob");
+            htmx.process(resultDiv);
+        }
+    </script>
+</head>
+<body>
+    <h1>Are you closer to a good or bad restaurant?</h1>
+    <div id="result" hx-swap="outerHTML">
+        <button id="find-button" onclick="getLocation()">Try your luck!</button>
+    </div>
+</body>
+</html>
